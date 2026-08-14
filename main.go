@@ -12,9 +12,14 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Couldn't load env file: %s", err)
+	}
+
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		log.Fatalf("Missing DB path. DB path should be set")
 	}
 
 	host := os.Getenv("HOST")
