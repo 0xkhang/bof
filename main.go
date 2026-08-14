@@ -41,6 +41,20 @@ func main() {
 		log.Printf("db works!")
 	}
 
+	query := `
+	CREATE TABLE IF NOT EXISTS users (
+		username TEXT PRIMARY KEY NOT NULL,
+		email TEXT UNIQUE NOT NULL,
+		hash_password TEXT NOT NULL,
+		is_verified BOOLEAN NOT NULL DEFAULT "FALSE"
+	)
+	`
+
+	_, err = db.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
