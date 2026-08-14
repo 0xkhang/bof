@@ -1,12 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net"
 	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
@@ -23,6 +25,20 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
+	}
+
+	var db *sql.DB
+
+	db, err = sql.Open("sqlite3", "./bof.db")
+	if err != nil {
+		log.Fatalf("Failed to open connection: %s", err)
+	}
+	defer db.Close()
+
+	if db.Ping() != nil {
+		log.Fatalf("Failed to connect to db: %s", err)
+	} else {
+		log.Printf("db works!")
 	}
 
 	mux := http.NewServeMux()
