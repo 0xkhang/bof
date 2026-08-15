@@ -1,15 +1,33 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net"
 	"net/http"
 	"os"
 
+	"github.com/0xkhangle/bof/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
+
+type apiConfig struct {
+	db   database.Client
+	port string
+	host string
+}
+
+func (cfg *apiConfig) HandleHello(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "text/html; charset=utf-8")
+	w.Write([]byte(`
+		<html>
+		<head></head>
+			<body>
+				<h1>Hello world</h1>
+			</body>
+		</html>
+	`))
+}
 
 func main() {
 	err := godotenv.Load(".env")
@@ -22,6 +40,11 @@ func main() {
 		log.Fatalf("Missing DB path. DB path should be set")
 	}
 
+	dbClient, err := database.NewClient(dbPath)
+	if err != nil {
+		log.Fatalf("Couldnt't create DB client")
+	}
+
 	host := os.Getenv("HOST")
 	if host == "" {
 		host = "localhost"
@@ -32,47 +55,15 @@ func main() {
 		port = "8080"
 	}
 
-	var db *sql.DB
-
-	db, err = sql.Open("sqlite3", "./bof.db")
-	if err != nil {
-		log.Fatalf("Failed to open connection: %s", err)
-	}
-	defer db.Close()
-
-	if db.Ping() != nil {
-		log.Fatalf("Failed to connect to db: %s", err)
-	} else {
-		log.Printf("db works!")
-	}
-
-	query := `
-	CREATE TABLE IF NOT EXISTS users (
-		username TEXT PRIMARY KEY NOT NULL,
-		email TEXT UNIQUE NOT NULL,
-		hash_password TEXT NOT NULL,
-		is_verified BOOLEAN NOT NULL DEFAULT "FALSE"
-	)
-	`
-
-	_, err = db.Exec(query)
-	if err != nil {
-		log.Fatal(err)
+	cfg := apiConfig{
+		host: host,
+		port: port,
+		db:   dbClient,
 	}
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "text/html; charset=utf-8")
-		w.Write([]byte(`
-			<html>
-			<head></head>
-				<body>
-					<h1>Hello world</h1>
-				</body>
-			</html>
-		`))
-	})
+	mux.HandleFunc("/", cfg.HandleHello)
 
 	s := &http.Server{
 		Addr:    net.JoinHostPort(host, port),
