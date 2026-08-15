@@ -12,9 +12,10 @@ import (
 )
 
 type apiConfig struct {
-	db   database.Client
-	port string
-	host string
+	db       database.Client
+	port     string
+	host     string
+	platform string
 }
 
 func (cfg *apiConfig) HandleHello(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +28,22 @@ func (cfg *apiConfig) HandleHello(w http.ResponseWriter, r *http.Request) {
 			</body>
 		</html>
 	`))
+}
+
+func (cfg *apiConfig) HandleRollbackDB(w http.ResponseWriter, r *http.Request) {
+	if cfg.platform != "dev" {
+		w.Write([]byte(`You do not have the permisson. imposter!`))
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	if err := cfg.db.Rollback(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.Write([]byte(`DB is clean!`))
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
@@ -55,15 +72,22 @@ func main() {
 		port = "8080"
 	}
 
+	platform := os.Getenv("PLATFORM")
+	if port == "" {
+		port = "dev"
+	}
+
 	cfg := apiConfig{
-		host: host,
-		port: port,
-		db:   dbClient,
+		host:     host,
+		port:     port,
+		db:       dbClient,
+		platform: platform,
 	}
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", cfg.HandleHello)
+	mux.HandleFunc("/admin/reset", cfg.HandleRollbackDB)
 
 	s := &http.Server{
 		Addr:    net.JoinHostPort(host, port),

@@ -45,3 +45,15 @@ func (c *Client) autoMigrate() error {
 
 	return nil
 }
+
+func (c *Client) Rollback() error {
+	usersTable := `
+		DROP TABLE users;
+	`
+
+	_, err := c.db.ExecContext(context.Background(), usersTable)
+	if err != nil {
+		return err
+	}
+	return nil
+}
