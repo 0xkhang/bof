@@ -34,6 +34,7 @@ func (c *Client) autoMigrate() error {
 		id TEXT PRIMARY KEY,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		is_verified BOOLEAN DEFAULT "FALSE",
 		password TEXT NOT NULL,
 		email TEXT UNIQUE NOT NULL
 	);
@@ -46,9 +47,9 @@ func (c *Client) autoMigrate() error {
 	return nil
 }
 
-func (c *Client) Rollback() error {
+func (c *Client) Reset() error {
 	usersTable := `
-		DROP TABLE users;
+		DELETE FROM users;
 	`
 
 	_, err := c.db.ExecContext(context.Background(), usersTable)

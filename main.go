@@ -30,14 +30,14 @@ func (cfg *apiConfig) HandleHello(w http.ResponseWriter, r *http.Request) {
 	`))
 }
 
-func (cfg *apiConfig) HandleRollbackDB(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) HandleResetDB(w http.ResponseWriter, r *http.Request) {
 	if cfg.platform != "dev" {
 		w.Write([]byte(`You do not have the permisson. imposter!`))
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
-	if err := cfg.db.Rollback(); err != nil {
+	if err := cfg.db.Reset(); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -59,7 +59,7 @@ func main() {
 
 	dbClient, err := database.NewClient(dbPath)
 	if err != nil {
-		log.Fatalf("Couldnt't create DB client")
+		log.Fatalf("Couldnt't create DB client: %s", err)
 	}
 
 	host := os.Getenv("HOST")
