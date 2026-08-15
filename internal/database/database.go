@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"log"
 )
 
 type Client struct {
@@ -14,7 +15,10 @@ func NewClient(pathToDB string) (Client, error) {
 	if err != nil {
 		return Client{}, err
 	}
-	defer db.Close()
+
+	if db.Ping() == nil {
+		log.Printf("DB works!")
+	}
 
 	c := Client{db}
 	err = c.autoMigrate()
