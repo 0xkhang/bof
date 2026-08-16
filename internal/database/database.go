@@ -34,7 +34,7 @@ func (c *Client) autoMigrate() error {
 		id TEXT PRIMARY KEY,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		is_verified BOOLEAN DEFAULT "FALSE",
+		is_verified BOOLEAN DEFAULT 0,
 		password TEXT NOT NULL,
 		email TEXT UNIQUE NOT NULL
 	);
