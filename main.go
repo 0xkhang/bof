@@ -35,8 +35,8 @@ func (cfg *apiConfig) HandleHello(w http.ResponseWriter, r *http.Request) {
 
 func (cfg *apiConfig) HandleResetDB(w http.ResponseWriter, r *http.Request) {
 	if cfg.platform != "dev" {
-		w.Write([]byte(`You do not have the permisson. imposter!`))
 		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte(`You do not have the permisson. imposter!`))
 		return
 	}
 
@@ -45,8 +45,8 @@ func (cfg *apiConfig) HandleResetDB(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte(`DB is clean!`))
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`DB is clean!`))
 }
 
 func main() {
@@ -76,8 +76,8 @@ func main() {
 	}
 
 	platform := os.Getenv("PLATFORM")
-	if port == "" {
-		port = "dev"
+	if platform == "" {
+		platform = "dev"
 	}
 
 	var hasher auth.Hasher
