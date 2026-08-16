@@ -3,3 +3,6 @@ run:
 
 clean:
 	rm ./bof
+
+db:
+	sqlite3 ./bof.db
