@@ -7,3 +7,10 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.49
 )
+
+require github.com/alexedwards/argon2id v1.0.0
+
+require (
+	golang.org/x/crypto v0.55.0
+	golang.org/x/sys v0.47.0 // indirect
+)
