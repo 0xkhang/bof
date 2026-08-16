@@ -87,7 +87,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", cfg.HandleHello)
-	mux.HandleFunc("/admin/reset", cfg.HandleRollbackDB)
+	mux.HandleFunc("/admin/reset", cfg.HandleResetDB)
 
 	s := &http.Server{
 		Addr:    net.JoinHostPort(host, port),
