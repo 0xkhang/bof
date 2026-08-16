@@ -6,13 +6,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/0xkhangle/bof/internal/auth"
 	"github.com/0xkhangle/bof/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type apiConfig struct {
 	db       database.Client
+	hasher   auth.Hasher
 	port     string
 	host     string
 	platform string
@@ -77,10 +80,19 @@ func main() {
 		port = "dev"
 	}
 
+	var hasher auth.Hasher
+	switch os.Getenv("PASSWORD_ALGO") {
+	case "argon2id":
+		hasher = auth.NewArgon2Hasher()
+	default:
+		hasher = auth.NewBcryptHasher(bcrypt.DefaultCost)
+	}
+
 	cfg := apiConfig{
 		host:     host,
 		port:     port,
 		db:       dbClient,
+		hasher:   hasher,
 		platform: platform,
 	}
 
