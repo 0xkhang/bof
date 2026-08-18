@@ -96,10 +96,12 @@ func main() {
 		platform: platform,
 	}
 
-	mux := http.NewServeMux()
+	v1 := http.NewServeMux()
+	v1.HandleFunc("GET /hello", cfg.HandleHello)
+	v1.HandleFunc("POST /admin/reset", cfg.HandleResetDB)
 
-	mux.HandleFunc("/", cfg.HandleHello)
-	mux.HandleFunc("/admin/reset", cfg.HandleResetDB)
+	mux := http.NewServeMux()
+	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
 
 	s := &http.Server{
 		Addr:    net.JoinHostPort(host, port),
