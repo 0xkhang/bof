@@ -35,6 +35,8 @@ func (c *Client) autoMigrate() error {
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		is_verified BOOLEAN DEFAULT 0,
+		token_verification_hash TEXT NULL,
+		token_expires_at TIMESTAMP NULL,
 		password TEXT NOT NULL,
 		email TEXT UNIQUE NOT NULL
 	);
