@@ -21,34 +21,6 @@ type apiConfig struct {
 	platform string
 }
 
-func (cfg *apiConfig) HandleHello(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "text/html; charset=utf-8")
-	w.Write([]byte(`
-		<html>
-		<head></head>
-			<body>
-				<h1>Hello world</h1>
-			</body>
-		</html>
-	`))
-}
-
-func (cfg *apiConfig) HandleResetDB(w http.ResponseWriter, r *http.Request) {
-	if cfg.platform != "dev" {
-		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte(`You do not have the permisson. imposter!`))
-		return
-	}
-
-	if err := cfg.db.Reset(); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`DB is clean!`))
-}
-
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -97,8 +69,8 @@ func main() {
 	}
 
 	v1 := http.NewServeMux()
-	v1.HandleFunc("GET /hello", cfg.HandleHello)
-	v1.HandleFunc("POST /admin/reset", cfg.HandleResetDB)
+	v1.HandleFunc("GET /hello", cfg.HandlerHello)
+	v1.HandleFunc("POST /admin/reset", cfg.HandlerResetDB)
 
 	mux := http.NewServeMux()
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
