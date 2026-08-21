@@ -70,13 +70,13 @@ func (c Client) CreateUser(params CreateUserParams) (*User, error) {
 
 func (c Client) GetUser(id uuid.UUID) (*User, error) {
 	query := `
-		SELECT id, created_at, updated_at, email, password
+		SELECT id, created_at, updated_at, email
 		FROM users
 		WHERE id = ?
 	`
 	var user User
 	var idStr string
-	err := c.db.QueryRow(query, id.String()).Scan(&idStr, &user.CreatedAt, &user.UpdatedAt, &user.Email, &user.Password)
+	err := c.db.QueryRow(query, id.String()).Scan(&idStr, &user.CreatedAt, &user.UpdatedAt, &user.Email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -88,6 +88,30 @@ func (c Client) GetUser(id uuid.UUID) (*User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (c Client) GetUserByEmail(email string) (User, error) {
+	query := `
+		SELECT id, created_at, updated_at, email
+		FROM users
+		WHERE email = ?
+	`
+
+	var user User
+	var id string
+	err := c.db.QueryRow(query, email).Scan(&id, &user.CreatedAt, &user.UpdatedAt, &user.Email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return User{}, nil
+		}
+		return User{}, err
+	}
+
+	user.ID, err = uuid.Parse(id)
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
 }
 
 func (c Client) DeleteUser(id uuid.UUID) error {
