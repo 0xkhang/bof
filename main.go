@@ -52,19 +52,10 @@ func main() {
 		platform = "dev"
 	}
 
-	var hasher auth.Hasher
-	switch os.Getenv("PASSWORD_ALGO") {
-	case "argon2id":
-		hasher = auth.NewArgon2Hasher()
-	default:
-		hasher = auth.NewBcryptHasher(bcrypt.DefaultCost)
-	}
-
 	cfg := apiConfig{
 		host:     host,
 		port:     port,
 		db:       dbClient,
-		hasher:   hasher,
 		platform: platform,
 	}
 
