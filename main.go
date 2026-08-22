@@ -6,16 +6,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/0xkhangle/bof/internal/auth"
 	"github.com/0xkhangle/bof/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type apiConfig struct {
 	db       database.Client
-	hasher   auth.Hasher
 	port     string
 	host     string
 	platform string
@@ -62,6 +59,7 @@ func main() {
 	v1 := http.NewServeMux()
 	v1.HandleFunc("GET /hello", cfg.HandlerHello)
 	v1.HandleFunc("POST /admin/reset", cfg.HandlerResetDB)
+	v1.HandleFunc("POST /user", cfg.HandlerSignUp)
 
 	mux := http.NewServeMux()
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
