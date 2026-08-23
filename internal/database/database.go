@@ -37,7 +37,7 @@ func (c *Client) autoMigrate() error {
 		is_verified BOOLEAN DEFAULT 0,
 		token_verification_hash TEXT NULL,
 		token_expires_at TIMESTAMP NULL,
-		password TEXT NOT NULL,
+		hashed_password TEXT NOT NULL,
 		email TEXT UNIQUE NOT NULL
 	);
 	`

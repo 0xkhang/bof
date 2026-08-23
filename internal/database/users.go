@@ -10,10 +10,11 @@ import (
 )
 
 type User struct {
-	ID         uuid.UUID `json:"id"`
-	IsVerified bool      `json:"is_verified"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID             uuid.UUID `json:"id"`
+	IsVerified     bool      `json:"is_verified"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	HashedPassword string    `json:"hashed_password"`
 	CreateUserParams
 }
 
@@ -56,7 +57,7 @@ func (c Client) CreateUser(params CreateUserParams) (*User, error) {
 
 	query := `
 		INSERT INTO users
-		    (id, created_at, updated_at, email, password)
+		    (id, created_at, updated_at, email, hashed_password)
 		VALUES
 		    (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)
 	`
@@ -70,13 +71,13 @@ func (c Client) CreateUser(params CreateUserParams) (*User, error) {
 
 func (c Client) GetUser(id uuid.UUID) (*User, error) {
 	query := `
-		SELECT id, created_at, updated_at, email
+		SELECT id, created_at, updated_at, email, hashed_password
 		FROM users
 		WHERE id = ?
 	`
 	var user User
 	var idStr string
-	err := c.db.QueryRow(query, id.String()).Scan(&idStr, &user.CreatedAt, &user.UpdatedAt, &user.Email)
+	err := c.db.QueryRow(query, id.String()).Scan(&idStr, &user.CreatedAt, &user.UpdatedAt, &user.Email, &user.HashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -92,14 +93,14 @@ func (c Client) GetUser(id uuid.UUID) (*User, error) {
 
 func (c Client) GetUserByEmail(email string) (User, error) {
 	query := `
-		SELECT id, created_at, updated_at, email
+		SELECT id, created_at, updated_at, email, hashed_password
 		FROM users
 		WHERE email = ?
 	`
 
 	var user User
 	var id string
-	err := c.db.QueryRow(query, email).Scan(&id, &user.CreatedAt, &user.UpdatedAt, &user.Email)
+	err := c.db.QueryRow(query, email).Scan(&id, &user.CreatedAt, &user.UpdatedAt, &user.Email, &user.HashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return User{}, nil
