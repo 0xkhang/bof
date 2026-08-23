@@ -11,6 +11,11 @@ require (
 require github.com/alexedwards/argon2id v1.0.0
 
 require (
+	github.com/wneessen/go-mail v0.8.1 // indirect
+	golang.org/x/text v0.41.0 // indirect
+)
+
+require (
 	golang.org/x/crypto v0.55.0
 	golang.org/x/sys v0.47.0 // indirect
 )
