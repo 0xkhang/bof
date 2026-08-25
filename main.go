@@ -12,12 +12,13 @@ import (
 )
 
 type apiConfig struct {
-	db            database.Client
-	port          string
-	host          string
-	platform      string
-	smtp_user     string
-	smtp_password string
+	db           database.Client
+	port         string
+	host         string
+	platform     string
+	smtpUser     string
+	smtpPassword string
+	tokenSecret  string
 }
 
 func main() {
@@ -54,13 +55,16 @@ func main() {
 	stmpUser := os.Getenv("SMTP_USER")
 	stmpPass := os.Getenv("SMTP_PASSWORD")
 
+	tokenSecret := os.Getenv("ACCESS_TOKEN_SECRET")
+
 	cfg := apiConfig{
-		host:          host,
-		port:          port,
-		db:            dbClient,
-		platform:      platform,
-		smtp_user:     stmpUser,
-		smtp_password: stmpPass,
+		host:         host,
+		port:         port,
+		db:           dbClient,
+		platform:     platform,
+		smtpUser:     stmpUser,
+		smtpPassword: stmpPass,
+		tokenSecret:  tokenSecret,
 	}
 
 	v1 := http.NewServeMux()
