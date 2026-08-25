@@ -18,7 +18,7 @@ func MakeJWT(userID uuid.UUID, tokenSecret string, tokenExpires time.Duration) (
 	}
 	method := jwt.SigningMethodHS256
 	t := jwt.NewWithClaims(method, claims)
-	s, err := t.SignedString(tokenSecret)
+	s, err := t.SignedString([]byte(tokenSecret))
 	if err != nil {
 		return "", err
 	}
