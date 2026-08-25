@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/0xkhangle/bof/internal/auth"
 )
@@ -11,6 +14,12 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	type ReqBody struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+	}
+
+	type response struct {
+		ID          uuid.UUID `json:"id"`
+		Status      string    `json:"status"`
+		AccessToken string    `json:"access_token"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -38,9 +47,15 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	RespondWithJSON(w, http.StatusOK, struct {
-		Message string `json:"message"`
-	}{
-		Message: "Logged in!",
+	accessToken, err := auth.MakeJWT(user.ID, cfg.tokenSecret, time.Hour)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, err, "Error creating JWT token")
+		return
+	}
+
+	RespondWithJSON(w, http.StatusOK, response{
+		ID:          user.ID,
+		Status:      "Logged in!",
+		AccessToken: accessToken,
 	})
 }
