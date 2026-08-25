@@ -41,7 +41,23 @@ func (c *Client) autoMigrate() error {
 		email TEXT UNIQUE NOT NULL
 	);
 	`
+
 	_, err := c.db.ExecContext(context.Background(), userTable)
+	if err != nil {
+		return err
+	}
+
+	birthdayTable := `
+	CREATE TABLE IF NOT EXISTS birthdays (
+		id TEXT PRIMARY KEY,
+		friends_name TEXT NOT NULL,
+		dob TEXT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+
+	_, err = c.db.ExecContext(context.Background(), birthdayTable)
 	if err != nil {
 		return err
 	}
