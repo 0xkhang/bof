@@ -20,6 +20,11 @@ func NewClient(pathToDB string) (Client, error) {
 		log.Printf("DB works!")
 	}
 
+	_, err = db.ExecContext(context.Background(), "PRAGMA foreign_keys = ON;")
+	if err != nil {
+		return Client{}, err
+	}
+
 	c := Client{db}
 	err = c.autoMigrate()
 	if err != nil {
@@ -50,10 +55,13 @@ func (c *Client) autoMigrate() error {
 	birthdayTable := `
 	CREATE TABLE IF NOT EXISTS birthdays (
 		id TEXT PRIMARY KEY,
+		user_id TEXT NOT NULL,
 		friends_name TEXT NOT NULL,
 		dob TEXT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (user_id) REFERENCES users(id),
+		UNIQUE(user_id, friends_name)
 	);
 	`
 
