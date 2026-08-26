@@ -56,29 +56,28 @@ func (c *Client) autoMigrate() error {
 	CREATE TABLE IF NOT EXISTS birthdays (
 		id TEXT PRIMARY KEY,
 		user_id TEXT NOT NULL,
-		friends_name TEXT NOT NULL,
+		name TEXT NOT NULL,
 		dob TEXT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (user_id) REFERENCES users(id),
-		UNIQUE(user_id, friends_name)
+		UNIQUE(user_id, name)
 	);
 	`
 
 	_, err = c.db.ExecContext(context.Background(), birthdayTable)
-	if err != nil {
-		return err
+	if err != nil { return err
 	}
 
 	return nil
 }
 
 func (c *Client) Reset() error {
-	usersTable := `
-		DELETE FROM users;
-	`
-
-	_, err := c.db.ExecContext(context.Background(), usersTable)
+	_, err := c.db.ExecContext(context.Background(), "DELETE FROM birthdays;")
+	if err != nil {
+		return err
+	}
+	_, err = c.db.ExecContext(context.Background(), "DELETE FROM users;")
 	if err != nil {
 		return err
 	}
