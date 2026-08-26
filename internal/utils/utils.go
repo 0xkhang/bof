@@ -11,6 +11,7 @@ import (
 )
 
 type contextKey string
+
 const UserIDKey contextKey = "userID"
 
 var (
