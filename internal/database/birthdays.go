@@ -18,17 +18,17 @@ type Birthday struct {
 type CreateBirthdayParams struct {
 	UserID uuid.UUID `json:"user_id"`
 	Name   string    `json:"name"`
-	DOB    time.Time `json:"dob"`
+	DOB    string    `json:"dob"`
 }
 
 func (c Client) GetBirthdayByName(userID uuid.UUID, name string) (Birthday, error) {
 	query := `
-        SELECT id, name, dob FROM birthdays
+        SELECT id, user_id, name, dob, created_at, updated_at FROM birthdays
         WHERE name = ? and user_id = ?
     	`
 
 	var b Birthday
-	err := c.db.QueryRow(query, name, userID).Scan(&b.ID, &b.Name, &b.DOB)
+	err := c.db.QueryRow(query, name, userID).Scan(&b.ID, &b.UserID, &b.Name, &b.DOB, &b.CreatedAt, &b.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Birthday{}, err
