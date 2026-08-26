@@ -72,6 +72,7 @@ func main() {
 	v1.HandleFunc("POST /admin/reset", cfg.HandlerResetDB)
 	v1.HandleFunc("POST /auth/signup", cfg.HandlerSignUp)
 	v1.HandleFunc("POST /auth/login", cfg.HandlerLogin)
+	v1.Handle("POST /birthday", cfg.AuthMiddleware(http.HandlerFunc(cfg.HandlerCreateBirthday)))
 
 	mux := http.NewServeMux()
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
